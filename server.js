@@ -1,14 +1,17 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const Product = require("./model/productModel");
+const authRoutes = require('./routes/userRoutes')
 const app = express();
-const port = 3000;
+const port = 8000;
 
 app.use(express.json());
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
+
+app.use("/user", authRoutes)
 
 app.post("/product", async (req, res) => {
   try {
