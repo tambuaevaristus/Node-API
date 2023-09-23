@@ -6,6 +6,7 @@ const tourSchema = new mongoose.Schema(
       type: String,
       required: [true, "Tour must have a name"],
     },
+    slug: String,
     durations: {
       type: Number,
     },
@@ -40,6 +41,10 @@ const tourSchema = new mongoose.Schema(
       select: false,
     },
     startDates: [Date],
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
     imageCover: String,
     images: [String],
   },
@@ -53,5 +58,21 @@ tourSchema.virtual("durationWeeks").get(function () {
   return this.durations / 7;
 });
 
+// runs before .save and .create
+
+// tourSchema.pre('save', function(next){
+// this.slug = slugify(this.name, {lower:true});
+// next();
+// });
+
+// tourSchema.post('save', function(doc, next){
+//  console.log(doc);
+//  next()
+// });
+
+tourSchema.pre("find", function (next) {
+  this.find({ secretTour:true});
+  next();
+});
 const Tour = mongoose.model("Tour", tourSchema);
 module.exports = Tour;
