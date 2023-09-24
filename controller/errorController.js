@@ -1,3 +1,4 @@
+// Development
 const  sendErrorDev = (err, res) =>{
     res.status(err.statuCode).json({
         status: err.status,
@@ -6,6 +7,8 @@ const  sendErrorDev = (err, res) =>{
         stack: err.stack,
       });
 }
+
+// prodution
 const  sendErrorProd = (err, res) =>{
     if(err.isOperational){
         res.status(err.statuCode).json({
