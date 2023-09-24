@@ -76,10 +76,10 @@ tourSchema.virtual("durationWeeks").get(function () {
 //  next()
 // });
 
-tourSchema.pre("find", function (next) {
-  this.find({ secretTour: true });
-  next();
-});
+// tourSchema.pre("find", function (next) {
+//   this.find({ secretTour: true });
+//   next();
+// });
 
 // Aggregation middleware
 tourSchema.pre("aggregate", function (next) {
