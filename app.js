@@ -1,7 +1,8 @@
 const express = require("express");
 const authRoutes = require('./routes/userRoutes')
 const tourRoutes = require("./routes/tourRoute");
-const appError =require('./utils/appError')
+const AppError =require('./utils/appError')
+const globalErrorHandler =  require('./controller/errorController')
 const app = express();
 
 
@@ -17,15 +18,7 @@ app.all('*', (req, res, next) => {
 })
 
 // handle general errors
-app.use((err, req,res, next)=>{
-    err.statuCode = err.statusCode || 500;
-    error.status = err.status || "error";
-
-    res.status(err.statuCode).json({
-        status: err.status,
-        message: err.message,
-    })
-})
+app.use(globalErrorHandler)
 // app.use("/api/v1/users", userRouter);
 
 module.exports = app 
