@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("./../model/userModel");
 const catchAsync = require("./../utils/catchAsync");
+const AppError = require("./../utils/appError");
 
 exports.signup = async (req, res, next) => {
   try {
@@ -26,6 +27,21 @@ exports.signup = async (req, res, next) => {
     res.status(500).json({
       status: "fail",
       message: err.message,
+    });
+  }
+};
+
+exports.login = function (req, res, next) {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    next(new AppError("Please provide email and password"));
+  } else {
+    const token = "";
+    res.status(201).json({
+      status: "success",
+      email: email,
+      token,
     });
   }
 };
