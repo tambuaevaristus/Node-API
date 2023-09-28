@@ -62,3 +62,11 @@ exports.login = async (req, res, next) => {
     });
   }
 };
+
+exports.protect = catchAsync(async(req, res, next) => {
+  // Get token and check if it exists
+
+  
+
+  next();
+});
