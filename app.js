@@ -11,6 +11,7 @@ app.use("/api/v1/tours", tourRoutes);
 app.use("/api/v1/users", userRoutes);
 
 app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
   console.log("Header ===>",req.headers)
 
   next();

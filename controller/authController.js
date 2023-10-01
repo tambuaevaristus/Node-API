@@ -1,10 +1,11 @@
+const { promisify } = require("util");
 const jwt = require("jsonwebtoken");
 const User = require("./../model/userModel");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
 
 const signToken = (id) => {
-  jwt.sign({ id: id }, "secret-key", {
+  jwt.sign({ id }, "secret-key", {
     expiresIn: "90d",
   });
 };
@@ -21,8 +22,8 @@ exports.signup = async (req, res, next) => {
     const token = signToken(newUser._id);
 
     res.status(201).json({
-      status: "success",
-      token,
+      status: "success>",
+      token: "Yessoo" + token,
       data: {
         user: newUser,
       },
@@ -46,10 +47,10 @@ exports.login = async (req, res, next) => {
     const user = await User.findOne({ email }).select("+password");
 
     if (!user || !(await user.correctPassword(password, user.password))) {
-      console.log("Need to Error<> === <>");
       return next(new AppError("Incorect Email or password", 401));
     }
     const token = signToken(user._id);
+
     res.status(201).json({
       status: "success",
       user,
@@ -63,10 +64,25 @@ exports.login = async (req, res, next) => {
   }
 };
 
-exports.protect = catchAsync(async(req, res, next) => {
+exports.protect = catchAsync(async (req, res, next) => {
+  let token;
   // Get token and check if it exists
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+  console.log(token);
 
-  
+  if (!token) {
+    return next(
+      new AppError("YOu are not logged in Please log in again to continue", 401)
+    );
+  }
 
+  // Verify Token
+  const decoded = await promisify(jwt.verify)(token, "secret-key");
+  console.log(decoded);
   next();
 });
