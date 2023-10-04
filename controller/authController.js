@@ -5,8 +5,8 @@ const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
 
 const signToken = (id) => {
-  jwt.sign({ id }, "secret-key", {
-    expiresIn: "90d",
+  jwt.sign({ id: id }, "this is a long key that is really long", {
+    expiresIn: "10d",
   });
 };
 
@@ -19,7 +19,14 @@ exports.signup = async (req, res, next) => {
       passwordConfirm: req.body.passwordConfirm,
     });
 
-    const token = signToken(newUser._id);
+    // const token = signToken(newUser.name);
+    const token = jwt.sign(
+      { id: user._id},
+      "THis is the token key",
+      {
+        expiresIn: "2h",
+      }
+    );
 
     res.status(201).json({
       status: "success>",
@@ -49,8 +56,14 @@ exports.login = async (req, res, next) => {
     if (!user || !(await user.correctPassword(password, user.password))) {
       return next(new AppError("Incorect Email or password", 401));
     }
-    const token = signToken(user._id);
-
+    // const token = signToken(user);
+    const token = jwt.sign(
+      { id: user._id},
+      "THis is the token key",
+      {
+        expiresIn: "2h",
+      }
+    );
     res.status(201).json({
       status: "success",
       user,
@@ -77,12 +90,12 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   if (!token) {
     return next(
-      new AppError("YOu are not logged in Please log in again to continue", 401)
+      new AppError("You are not logged in Please log in again to continue", 401)
     );
   }
 
   // Verify Token
-  const decoded = await promisify(jwt.verify)(token, "secret-key");
+  const decoded = await promisify(jwt.verify)(token, "THis is the token key");
   console.log(decoded);
   next();
 });
