@@ -4,8 +4,8 @@ const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
 
 const signToken = (id) => {
-  jwt.sign({ id: id }, "secret-key", {
-    expiresIn: "90d",
+  jwt.sign({ id: id }, "this is a long key that is really long", {
+    expiresIn: "10d",
   });
 };
 
@@ -18,7 +18,14 @@ exports.signup = async (req, res, next) => {
       passwordConfirm: req.body.passwordConfirm,
     });
 
-    const token = signToken(newUser._id);
+    // const token = signToken(newUser.name);
+    const token = jwt.sign(
+      { user_id: user._id},
+      "THis is the token key",
+      {
+        expiresIn: "2h",
+      }
+    );
 
     res.status(201).json({
       status: "success",
@@ -49,7 +56,14 @@ exports.login = async (req, res, next) => {
       console.log("Need to Error<> === <>");
       return next(new AppError("Incorect Email or password", 401));
     }
-    const token = signToken(user._id);
+    // const token = signToken(user);
+    const token = jwt.sign(
+      { user_id: user._id},
+      "THis is the token key",
+      {
+        expiresIn: "2h",
+      }
+    );
     res.status(201).json({
       status: "success",
       user,
