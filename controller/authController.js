@@ -20,13 +20,9 @@ exports.signup = async (req, res, next) => {
     });
 
     // const token = signToken(newUser.name);
-    const token = jwt.sign(
-      { id: user._id},
-      "THis is the token key",
-      {
-        expiresIn: "2h",
-      }
-    );
+    const token = jwt.sign({ id: newUser._id }, "THis is the token key", {
+      expiresIn: "2h",
+    });
 
     res.status(201).json({
       status: "success>",
@@ -57,13 +53,9 @@ exports.login = async (req, res, next) => {
       return next(new AppError("Incorect Email or password", 401));
     }
     // const token = signToken(user);
-    const token = jwt.sign(
-      { id: user._id},
-      "THis is the token key",
-      {
-        expiresIn: "2h",
-      }
-    );
+    const token = jwt.sign({ id: user._id }, "THis is the token key", {
+      expiresIn: "2h",
+    });
     res.status(201).json({
       status: "success",
       user,
@@ -86,7 +78,6 @@ exports.protect = catchAsync(async (req, res, next) => {
   ) {
     token = req.headers.authorization.split(" ")[1];
   }
-  console.log(token);
 
   if (!token) {
     return next(
@@ -96,6 +87,16 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // Verify Token
   const decoded = await promisify(jwt.verify)(token, "THis is the token key");
-  console.log(decoded);
+
+  // check if user still exist
+
+  const freshUser = await User.findById(decoded.id);
+  if (!freshUser) {
+    return next(new AppError("User belonging to this token does not exist", 401));
+  }
+
+ if( freshUser.changePasswordAfter(decoded.iat)){
+  return next(new AppError('User has already changed their password', 401))
+ }
   next();
 });
