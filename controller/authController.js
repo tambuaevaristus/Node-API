@@ -15,18 +15,19 @@ exports.signup = async (req, res, next) => {
     const newUser = await User.create({
       name: req.body.name,
       email: req.body.email,
+      role: req.body.role,
       password: req.body.password,
       passwordConfirm: req.body.passwordConfirm,
     });
 
     // const token = signToken(newUser.name);
     const token = jwt.sign({ id: newUser._id }, "THis is the token key", {
-      expiresIn: "2h",
+      expiresIn: "90d",
     });
 
     res.status(201).json({
       status: "success>",
-      token: "Yessoo" + token,
+      token: token,
       data: {
         user: newUser,
       },
@@ -54,7 +55,7 @@ exports.login = async (req, res, next) => {
     }
     // const token = signToken(user);
     const token = jwt.sign({ id: user._id }, "THis is the token key", {
-      expiresIn: "2h",
+      expiresIn: "90d",
     });
     res.status(201).json({
       status: "success",
@@ -92,11 +93,28 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   const freshUser = await User.findById(decoded.id);
   if (!freshUser) {
-    return next(new AppError("User belonging to this token does not exist", 401));
+    return next(
+      new AppError("User belonging to this token does not exist", 401)
+    );
   }
 
- if( freshUser.changePasswordAfter(decoded.iat)){
-  return next(new AppError('User has already changed their password', 401))
- }
+  if (freshUser.changePasswordAfter(decoded.iat)) {
+    return next(new AppError("User has already changed their password", 401));
+  }
+
+  // Grant access to protected routes
+  req.user = freshUser
   next();
 });
+
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    // console.log("User role ==>", req.user.role);
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError("YOu do not have permision to perform this request", 403)
+      );
+    }
+    next();
+  };
+};
