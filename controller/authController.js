@@ -103,7 +103,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   // Grant access to protected routes
-  req.user = freshUser
+  req.user = freshUser;
   next();
 });
 
@@ -118,3 +118,17 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
+exports.forgotPassword = async (req, res, next) => {
+  // Get user bassed on posted email
+  const user = await User.findOne({ email: req.body.email });
+
+  if (!user) {
+    return next(new AppError("There is no user with that email address.", 404));
+  }
+
+  // geneerate random token
+  const resetToken = user.createPasswordResetToken();
+  await user.save();
+};
+exports.resetPassword = (req, res, next) => {};
