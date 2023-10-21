@@ -12,7 +12,7 @@ app.use("/api/v1/users", userRoutes);
 
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
-  console.log("Header ===>",req.headers)
+  console.log("Header =mm==>",req.headers)
 
   next();
 })
