@@ -1,16 +1,20 @@
 const catchAsync = require("../utils/catchAsync");
-const accountSid = "AC48c29140d5b5a566e674061a78ab8d54";
-const authToken = "c194664c113cb9365bf75784ad7ba0dd";
+const accountSid = "AC4671bc8712de16eca6659f6e3b85bbb8";
+const authToken = "d675f2fd87eee1965fd965ced472a4a6";
 
 const client = require("twilio")(accountSid, authToken);
 
+exports.sendMessage = catchAsync(async (req, res, next) => {
+  const messageResponse = await client.messages.create({
+    body: req.body.body,
+    from: "whatsapp:+14154668513",
+    to: "whatsapp:" + req.body.to,
+  });
 
-exports.sendMessage = catchAsync( async(req, res, next)=>{
-    await client.messages
-    .create({
-      body: req.body.message,
-      from: "whatsapp:+14155238886",
-      to: "whatsapp:+237676814364",
-    })
-    .then((message) => console.log(message.sid));
-})
+  res.status(200).json({
+    status: "success",
+    data: {
+      messageResponse,
+    },
+  });
+});
