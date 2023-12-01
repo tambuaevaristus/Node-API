@@ -39,6 +39,7 @@ exports.sendMessage = catchAsync(async (req, res, next) => {
 //     console.error("Error checking WhatsApp number:", error);
 //   }
 // }
+// 
 
 async function send(phone, body) {
   const messageResponse = await client.messages
